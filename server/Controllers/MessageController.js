@@ -72,6 +72,7 @@ exports.getInbox = async (req, res) => {
                 { receiver: userId }
             ]
         }).sort('-timestamp').populate('sender', 'userName profileImage').populate('receiver', 'userName profileImage');
+        
         // Group by conversation (other user)
         const conversations = {};
         messages.forEach(msg => {
