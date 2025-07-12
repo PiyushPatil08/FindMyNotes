@@ -1,4 +1,4 @@
 // API Configuration for different environments
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:6969';
+const API_BASE_URL = 'https://find-my-notes-rust.vercel.app/api ';
 
 export default API_BASE_URL; 

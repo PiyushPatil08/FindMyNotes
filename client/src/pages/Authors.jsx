@@ -42,7 +42,7 @@ const Authors = () => {
     const fetchAuthors = async () => {
       setLoading(true);
       try {
-        let url = `http://localhost:6969/authors`;
+        let url = `${API_BASE_URL}/authors`;
         if (search) url += `?search=${encodeURIComponent(search)}`;
         
         const res = await axios.get(url);

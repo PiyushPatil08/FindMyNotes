@@ -10,15 +10,15 @@ const Categories = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:6969/categories").then(res => setCategories(res.data));
+    axios.get(`${API_BASE_URL}/categories`).then(res => setCategories(res.data));
   }, []);
 
   const handleAddCategory = async (e) => {
     e.preventDefault();
     if (!newCategory.trim()) return;
-    await axios.post("http://localhost:6969/categories", { name: newCategory });
+    await axios.post(`${API_BASE_URL}/categories`, { name: newCategory });
     setNewCategory("");
-    axios.get("http://localhost:6969/categories").then(res => setCategories(res.data));
+    axios.get(`${API_BASE_URL}/categories`).then(res => setCategories(res.data));
   };
 
   const handleSelectCategory = (cat) => {
