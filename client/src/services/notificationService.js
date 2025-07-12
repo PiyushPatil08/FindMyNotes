@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_BASE_URL = 'http://localhost:6969';
+import API_BASE_URL from '../config/api.js';
 
 export const notificationService = {
   // Get all notifications for a user

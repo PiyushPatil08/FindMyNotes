@@ -9,35 +9,44 @@ const noteRoutes = require("./Routes/notes");
 const notificationsRoute = require('./Routes/notifications');
 
 const app = express();
-const PORT = 6969;
+const PORT = process.env.PORT || 6969;
 
 dotenv.config();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
 
+// Connect to MongoDB
+const connectDB = async () => {
+    try {
+        await mongoose.connect(process.env.MONGO_URL);
+        console.log("Connection Successful");
+    } catch (error) {
+        console.log("MongoDB connection error:", error);
+    }
+};
 
-try {
-    mongoose.connect(process.env.MONGO_URL);
-    console.log("Connection Successfull");
-} catch (error) {
-    console.log(error);
-}
+connectDB();
 
 app.get("/", (req, res) => {
     res.send("Server Is Running");
 });
 
+// API routes
+app.use("/api/auth", authRoutes);
+app.use("/api/notes", noteRoutes);
+app.use("/api/files", express.static("files"));
+app.use("/api/comments", require("./Routes/comments"));
+app.use("/api/categories", require("./Routes/categories"));
+app.use("/api/messages", require("./Routes/messages"));
+app.use("/api/authors", require("./Routes/authors"));
+app.use('/api/notifications', notificationsRoute);
 
-app.use("/auth", authRoutes);
-app.use("/notes", noteRoutes);
-app.use("/files", express.static("files"));
-app.use("/comments", require("./Routes/comments"));
-app.use("/categories", require("./Routes/categories"));
-app.use("/messages", require("./Routes/messages"));
-app.use("/authors", require("./Routes/authors"));
-app.use('/notifications', notificationsRoute);
+// Only listen if not in Vercel environment
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`Server Running on Port ${PORT}`);
+    });
+}
 
-app.listen(PORT, () => {
-    console.log(`Server Running on Port ${PORT}`);
-})
+module.exports = app;
