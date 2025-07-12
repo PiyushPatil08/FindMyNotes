@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API_BASE_URL from '../config/api.js';
+
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
@@ -22,7 +24,7 @@ const Categories = () => {
   const handleSelectCategory = (cat) => {
     setSelectedCategory(cat);
     if (cat) {
-      axios.get(`http://localhost:6969/notes/getFiles?category=${encodeURIComponent(cat)}`).then(res => setNotes(res.data));
+      axios.get(`${API_BASE_URL}/notes/getFiles?category=${encodeURIComponent(cat)}`).then(res => setNotes(res.data));
     } else {
       setNotes([]);
     }
@@ -79,7 +81,7 @@ const Categories = () => {
                     ))}
                   </div>
                   <div className="flex items-center justify-between mt-4">
-                    <a href={`http://localhost:6969/files/${note.files}`} target="_blank" rel="noopener noreferrer" className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Download</a>
+                    <a href={`${API_BASE_URL}/files/${note.files}`} target="_blank" rel="noopener noreferrer" className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Download</a>
                   </div>
                 </div>
               ))

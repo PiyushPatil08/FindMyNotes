@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import API_BASE_URL from '../config/api.js';
+
 
 const ChatWindow = ({ conversation, user, onSend }) => {
   const [messages, setMessages] = useState([]);
@@ -18,7 +20,7 @@ const ChatWindow = ({ conversation, user, onSend }) => {
       if (initialLoad.current) {
         setLoading(true);
       }
-      const res = await axios.get(`http://localhost:6969/messages/${user._id}/${conversation._id}`);
+      const res = await axios.get(`${API_BASE_URL}/messages/${user._id}/${conversation._id}`);
       setMessages(res.data);
       if (initialLoad.current) {
         setLoading(false);
@@ -129,7 +131,7 @@ const InboxPage = () => {
     const fetchInbox = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`http://localhost:6969/messages/inbox/${user._id}`);
+        const res = await axios.get(`${API_BASE_URL}/messages/inbox/${user._id}`);
         setConversations(prev => {
           // Only update if changed
           const newUsers = res.data.map(c => c.user);
@@ -159,7 +161,7 @@ const InboxPage = () => {
     setSearching(true);
     const fetchUsers = async () => {
       try {
-        const res = await axios.get(`http://localhost:6969/authors/search?query=${encodeURIComponent(search)}`);
+        const res = await axios.get(`${API_BASE_URL}/authors/search?query=${encodeURIComponent(search)}`);
         // Exclude self
         setSearchResults(res.data.filter(u => u._id !== user._id));
       } catch (err) {

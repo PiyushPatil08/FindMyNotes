@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import NoteCard from "../components/NoteCard";
+import API_BASE_URL from '../config/api.js';
+
 
 const AuthorDetails = () => {
   const { id } = useParams();
@@ -16,7 +18,7 @@ const AuthorDetails = () => {
       setLoading(true);
       try {
         // Use the correct endpoint for getting author profile
-        const authorRes = await axios.get(`http://localhost:6969/authors/${id}`);
+        const authorRes = await axios.get(`${API_BASE_URL}/authors/${id}`);
         const authorData = authorRes.data;
         
         // Set author data (the API returns { user, notes })

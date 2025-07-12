@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import API_BASE_URL from "../config/api.js";
 
 const Signup = () => {
   const [profilePreviewImage, setProfilePreviewImage] = useState("");
@@ -28,7 +29,7 @@ const Signup = () => {
       formData.append("userPassword", userPassword);
       formData.append("profileImage", profileImage);
       const result = await axios.post(
-        "http://localhost:6969/auth/signup",
+        `${API_BASE_URL}/auth/signup`,
         formData,
         {
           headers: {

@@ -1,5 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from '../config/api.js';
+
 
 const NoteCard = ({ note }) => {
   const navigate = useNavigate();
@@ -11,7 +13,7 @@ const NoteCard = ({ note }) => {
       {/* Thumbnail */}
       <div className="w-full aspect-[3/2] bg-gray-100 overflow-hidden">
         <img
-          src={note.thumbnail ? `http://localhost:6969/files/${note.thumbnail}` : "/public/logo.png"}
+          src={note.thumbnail ? `${API_BASE_URL}/files/${note.thumbnail}` : "/public/logo.png"}
           alt="thumbnail"
           className="object-cover w-full h-full rounded-t-2xl"
         />

@@ -3,6 +3,8 @@ import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import NoteCard from "../components/NoteCard";
+import API_BASE_URL from '../config/api.js';
+
 
 const Profile = () => {
   const user = useSelector((state) => state.user.userData);
@@ -22,12 +24,12 @@ const Profile = () => {
   useEffect(() => {
     if (!user?._id) return;
     // Get uploaded notes
-    axios.get(`http://localhost:6969/notes/getFiles?`).then(res => {
+    axios.get(`${API_BASE_URL}/notes/getFiles?`).then(res => {
       setNotes(res.data.filter(n => n.uploadedBy?._id === user._id));
       setLikedNotes(res.data.filter(n => n.likes && n.likes.includes(user._id)));
     });
     // Get comments by user
-    axios.get(`http://localhost:6969/comments`).then(res => {
+    axios.get(`${API_BASE_URL}/comments`).then(res => {
       setComments(res.data.filter(c => c.user?._id === user._id));
     }).catch(() => setComments([]));
   }, [user]);
@@ -167,14 +169,14 @@ const Profile = () => {
         const formData = new FormData();
         formData.append('image', selectedImage);
         
-        const imageRes = await axios.post('http://localhost:6969/upload-image', formData, {
+        const imageRes = await axios.post(`${API_BASE_URL}/upload-image`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         
         updateData.profileImage = imageRes.data.imageUrl;
       }
       
-      const res = await axios.put(`http://localhost:6969/authors/${user._id}`, updateData);
+      const res = await axios.put(`${API_BASE_URL}/authors/${user._id}`, updateData);
       dispatch({ type: 'user/setUserData', payload: res.data });
       setEditMode(false);
       setSelectedImage(null);

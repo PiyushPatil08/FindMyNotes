@@ -2,6 +2,8 @@ import axios from "axios";
 import React, { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { useSelector } from "react-redux";
+import API_BASE_URL from '../config/api.js';
+
 
 const SearchBar = () => {
 
@@ -17,7 +19,7 @@ const SearchBar = () => {
     e.preventDefault();
 
     try {
-      const notes = await axios.get("http://localhost:6969/notes/getFiles", {
+      const notes = await axios.get("${API_BASE_URL}/notes/getFiles", {
         params: {
           title: searchQuery,
         },
@@ -36,7 +38,7 @@ const SearchBar = () => {
   }
 
   const showPDF = async (files) => {
-    window.open(`http://localhost:6969/files/${files}`, "_blank", "noreferrer");
+    window.open(`${API_BASE_URL}/files/${files}`, "_blank", "noreferrer");
   };
 
   return (

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from '../config/api.js';
+
 
 const AuthorCard = ({ author }) => (
   <div className="flex flex-col sm:flex-row items-center bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition w-full max-w-2xl mx-auto border border-gray-100 mb-4">
@@ -48,7 +50,7 @@ const Authors = () => {
         // For each author, fetch their notes to compute totals
         const authorsWithStats = await Promise.all(res.data.map(async author => {
           try {
-            const notesRes = await axios.get(`http://localhost:6969/notes/getFiles?`);
+            const notesRes = await axios.get(`${API_BASE_URL}/notes/getFiles?`);
             const userNotes = notesRes.data.filter(n => n.uploadedBy?._id === author._id);
             const totalNotes = userNotes.length;
             const totalLikes = userNotes.reduce((sum, n) => sum + (n.likes ? n.likes.length : 0), 0);

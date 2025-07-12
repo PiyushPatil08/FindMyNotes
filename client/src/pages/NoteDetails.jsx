@@ -3,6 +3,8 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { HeartIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import API_BASE_URL from '../config/api.js';
+
 
 const NoteDetails = () => {
   const { id } = useParams();
@@ -24,7 +26,7 @@ const NoteDetails = () => {
   const fetchNoteAndComments = async () => {
     setLoading(true);
     try {
-      const notesRes = await axios.get(`http://localhost:6969/notes/getFiles?ts=${Date.now()}`);
+      const notesRes = await axios.get(`${API_BASE_URL}/notes/getFiles?ts=${Date.now()}`);
       console.log('GET /notes/getFiles? response:', notesRes.data);
       console.log('Current note id:', id);
       console.log('All note ids:', notesRes.data.map(n => n._id));
@@ -32,7 +34,7 @@ const NoteDetails = () => {
       setNote(foundNote);
       console.log('Fetched note:', foundNote);
       if (foundNote) {
-        const commentsRes = await axios.get(`http://localhost:6969/comments/${foundNote._id}`);
+        const commentsRes = await axios.get(`${API_BASE_URL}/comments/${foundNote._id}`);
         setComments(commentsRes.data);
       } else {
         setComments([]);
@@ -65,7 +67,7 @@ const NoteDetails = () => {
     if (!user?._id) return alert("Login to like notes");
     setLikeLoading(true);
     const liked = note.likes?.includes(user._id);
-    const url = `http://localhost:6969/notes/${note._id}/${liked ? "unlike" : "like"}`;
+    const url = `${API_BASE_URL}/notes/${note._id}/${liked ? "unlike" : "like"}`;
     await axios.post(url, { userId: user._id });
     await fetchNoteAndComments();
     setLikeLoading(false);
@@ -75,8 +77,8 @@ const NoteDetails = () => {
     e.preventDefault();
     if (!user?._id) return alert("Login to comment");
     if (!newComment.trim()) return;
-    await axios.post(`http://localhost:6969/comments/${note._id}`, { userId: user._id, text: newComment });
-    const commentsRes = await axios.get(`http://localhost:6969/comments/${note._id}`);
+    await axios.post(`${API_BASE_URL}/comments/${note._id}`, { userId: user._id, text: newComment });
+    const commentsRes = await axios.get(`${API_BASE_URL}/comments/${note._id}`);
     setComments(commentsRes.data);
     setNewComment("");
     await fetchNoteAndComments();
@@ -108,7 +110,7 @@ const NoteDetails = () => {
         setEditLoading(false);
         return;
       }
-      await axios.put(`http://localhost:6969/notes/${note._id}`, updateObj);
+      await axios.put(`${API_BASE_URL}/notes/${note._id}`, updateObj);
       setEditMode(false);
       await fetchNoteAndComments();
     } catch (err) {
@@ -122,7 +124,7 @@ const NoteDetails = () => {
     setDeleteLoading(true);
     setDeleteError('');
     try {
-      await axios.delete(`http://localhost:6969/notes/${note._id}`);
+      await axios.delete(`${API_BASE_URL}/notes/${note._id}`);
       navigate('/notes');
     } catch (err) {
       setDeleteError(err.response?.data?.error || 'Failed to delete note');
@@ -181,7 +183,7 @@ const NoteDetails = () => {
           >
             ❤️ {note.likes?.length || 0}
           </button>
-          <a href={`http://localhost:6969/files/${note.files}`} target="_blank" rel="noopener noreferrer" className="bg-blue-500 text-white px-4 py-1.5 rounded-lg hover:bg-blue-600 font-semibold transition">Download PDF</a>
+          <a href={`${API_BASE_URL}/files/${note.files}`} target="_blank" rel="noopener noreferrer" className="bg-blue-500 text-white px-4 py-1.5 rounded-lg hover:bg-blue-600 font-semibold transition">Download PDF</a>
         </div>
       </div>
       <div className="bg-white rounded-xl shadow p-5 border border-gray-100">

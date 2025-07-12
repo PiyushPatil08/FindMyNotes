@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
+import API_BASE_URL from "../config/api.js";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const Login = () => {
     try {
       e.preventDefault();
       const user = { userEmail, userPassword };
-      const result = await axios.post("http://localhost:6969/auth/login", user);
+      const result = await axios.post(`${API_BASE_URL}/auth/login`, user);
       if(result.data.status==="Error") {
         toast.error("wrong credentials ");
         navigate("/login");

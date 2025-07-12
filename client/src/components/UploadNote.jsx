@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from '../config/api.js';
+
 
 const UploadNote = ({ editNote, onSuccess }) => {
   const [title, setTitle] = useState(editNote?.fileName || "");
@@ -45,10 +47,10 @@ const UploadNote = ({ editNote, onSuccess }) => {
       if (file) formData.append("file", file);
       if (thumbnail) formData.append("thumbnail", thumbnail);
       formData.append("userId", userId);
-      let url = "http://localhost:6969/notes/upload";
+      let url = "${API_BASE_URL}/notes/upload";
       let method = "post";
       if (editNote) {
-        url = `http://localhost:6969/notes/${editNote._id}`;
+        url = `${API_BASE_URL}/notes/${editNote._id}`;
         method = "put";
       }
       const res = await axios[method](url, formData, {
