@@ -15,7 +15,7 @@ dotenv.config();
 
 // CORS setup
 const allowedOrigins = [
-  'https://find-my-notes-psi.vercel.app/', // TODO: Replace with your actual Vercel URL
+  'https://find-my-notes-psi.vercel.app', // no trailing slash
   'http://localhost:5173'
 ];
 app.use(cors({
