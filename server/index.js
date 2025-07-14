@@ -12,7 +12,17 @@ const app = express();
 const PORT = process.env.PORT || 6969;
 
 dotenv.config();
-app.use(cors());
+
+// CORS setup
+const allowedOrigins = [
+  'https://yourproject.vercel.app', // TODO: Replace with your actual Vercel URL
+  'http://localhost:5173'
+];
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
+
 app.use(bodyParser.json());
 app.use(express.json());
 
@@ -43,10 +53,9 @@ app.use("/api/authors", require("./Routes/authors"));
 app.use('/api/notifications', notificationsRoute);
 
 // Only listen if not in Vercel environment
-if (process.env.NODE_ENV !== 'production') {
-    app.listen(PORT, () => {
-        console.log(`Server Running on Port ${PORT}`);
-    });
-}
+
+app.listen(PORT, () => {
+    console.log(`Server Running on Port ${PORT}`);
+});
 
 module.exports = app;
