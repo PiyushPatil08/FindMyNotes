@@ -95,6 +95,26 @@ exports.createNotification = async ({ user, type, relatedId, relatedType, messag
     const populatedNotification = await Notification.findById(notification._id)
       .populate('relatedId', 'fileName userName content')
       .populate('user', 'userName profileImage');
+    
+    // Emit socket event for real-time notification
+    try {
+      // Get the socket.io instance
+      const io = require('../index').io;
+      if (io) {
+        // Emit to user's notification room
+        const notificationRoom = `notifications:${user}`;
+        io.to(notificationRoom).emit('notification_received', populatedNotification);
+        
+        // Update unread count
+        const count = await Notification.countDocuments({ user, read: false });
+        io.to(notificationRoom).emit('notification_count', { count });
+        
+        console.log(`Real-time notification sent to user ${user}`);
+      }
+    } catch (socketError) {
+      console.error('Error sending real-time notification:', socketError);
+      // Continue even if socket emission fails
+    }
 
     return populatedNotification;
   } catch (err) {
@@ -112,4 +132,4 @@ exports.deleteNotification = async (req, res) => {
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
-}; 
+};

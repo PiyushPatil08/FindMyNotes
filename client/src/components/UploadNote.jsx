@@ -20,7 +20,7 @@ const UploadNote = ({ editNote, onSuccess }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get("http://localhost:6969/categories").then(res => setCategories(res.data));
+    axios.get(`${API_BASE_URL}/categories`).then(res => setCategories(res.data));
   }, []);
 
   const handleAddTag = (e) => {
@@ -47,7 +47,7 @@ const UploadNote = ({ editNote, onSuccess }) => {
       if (file) formData.append("file", file);
       if (thumbnail) formData.append("thumbnail", thumbnail);
       formData.append("userId", userId);
-      let url = "${API_BASE_URL}/notes/upload";
+      let url = `${API_BASE_URL}/notes/upload`;
       let method = "post";
       if (editNote) {
         url = `${API_BASE_URL}/notes/${editNote._id}`;

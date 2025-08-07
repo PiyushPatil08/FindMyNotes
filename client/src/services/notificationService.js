@@ -1,7 +1,13 @@
 import axios from 'axios';
 import API_BASE_URL from '../config/api.js';
 
+// Use the same base URL for socket connection but without the /api path
+const SOCKET_URL = API_BASE_URL.replace('/api', '');
+
 export const notificationService = {
+  // Socket URL for real-time notifications
+  socketUrl: SOCKET_URL,
+  
   // Get all notifications for a user
   getNotifications: async (userId) => {
     try {
@@ -76,4 +82,4 @@ export const notificationService = {
       return [];
     }
   }
-}; 
+};

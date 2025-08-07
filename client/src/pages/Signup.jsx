@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import API_BASE_URL from "../config/api.js";
+import { registerUser } from '../services/userService';
 
 const Signup = () => {
   const [profilePreviewImage, setProfilePreviewImage] = useState("");
@@ -16,7 +17,7 @@ const Signup = () => {
 
   const navigate = useNavigate();
 
-  const registerUser = async (e) => {
+  const registerUserHandler = async (e) => {
     try {
       e.preventDefault();
       const formData = new FormData();
@@ -28,15 +29,7 @@ const Signup = () => {
       formData.append("userName", userName);
       formData.append("userPassword", userPassword);
       formData.append("profileImage", profileImage);
-      const result = await axios.post(
-        `${API_BASE_URL}/auth/signup`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        },
-      );
+      await registerUser(formData);
       navigate("/login");
     } catch (error) {
       console.log("Failed to Register User: ", error);
@@ -45,7 +38,7 @@ const Signup = () => {
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center bg-gray-50 py-8 px-2">
-      <form className="w-full max-w-md flex flex-col gap-4 rounded-xl bg-white p-8 shadow-xl" onSubmit={registerUser}>
+      <form className="w-full max-w-md flex flex-col gap-4 rounded-xl bg-white p-8 shadow-xl" onSubmit={registerUserHandler}>
         <h1 className="text-2xl font-black text-center mb-2">Register</h1>
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex flex-col items-start justify-center w-full">

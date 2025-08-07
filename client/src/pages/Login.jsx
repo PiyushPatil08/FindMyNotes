@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import API_BASE_URL from "../config/api.js";
+import { loginUser } from '../services/userService';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -13,16 +14,15 @@ const Login = () => {
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
 
-  const loginUser = async (e) => {
+  const loginUserHandler = async (e) => {
     try {
       e.preventDefault();
-      const user = { userEmail, userPassword };
-      const result = await axios.post(`${API_BASE_URL}/auth/login`, user);
-      if(result.data.status==="Error") {
+      const result = await loginUser(userEmail, userPassword);
+      if(result.status==="Error") {
         toast.error("wrong credentials ");
         navigate("/login");
       } else {
-        dispatch(setUserData(result.data));
+        dispatch(setUserData(result));
         navigate("/");
       }
     } catch (error) {
@@ -32,7 +32,7 @@ const Login = () => {
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center bg-gray-50 py-8 px-2">
-      <form className="w-full max-w-md flex flex-col gap-4 rounded-xl bg-white p-8 shadow-xl" onSubmit={loginUser}>
+      <form className="w-full max-w-md flex flex-col gap-4 rounded-xl bg-white p-8 shadow-xl" onSubmit={loginUserHandler}>
         <h1 className="text-2xl font-bold text-center mb-2">Login</h1>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col items-start justify-center">

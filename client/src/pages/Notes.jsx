@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import NoteCard from "../components/NoteCard";
 import axios from "axios";
 import API_BASE_URL from '../config/api.js';
+import { fetchNotes } from '../services/noteService';
 
 
 const Notes = () => {
@@ -10,9 +11,7 @@ const Notes = () => {
   const [categoryIndexes, setCategoryIndexes] = useState({}); // Track scroll index per category
 
   useEffect(() => {
-    axios.get(`${API_BASE_URL}/notes/getFiles?`).then(res => {
-      setNotes(res.data);
-    });
+    fetchNotes().then(setNotes);
   }, []);
 
   // Group notes by category

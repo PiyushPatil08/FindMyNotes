@@ -1,24 +1,25 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const MessageSchema = new mongoose.Schema({
-    sender: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    receiver: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    content: {
-        type: String,
-        required: true
-    },
-    timestamp: {
-        type: Date,
-        default: Date.now
-    }
+const messageSchema = new mongoose.Schema({
+  sender: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  receiver: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  content: {
+    type: String,
+    required: true
+  },
+  timestamp: {
+    type: Date,
+    default: Date.now
+  }
 });
 
-module.exports = mongoose.model("Message", MessageSchema); 
+// Check if model exists before creating
+module.exports = mongoose.models.Message || mongoose.model('Message', messageSchema);

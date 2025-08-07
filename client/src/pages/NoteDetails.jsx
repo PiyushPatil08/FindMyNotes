@@ -4,6 +4,8 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import { HeartIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import API_BASE_URL from '../config/api.js';
+import { fetchNoteById, updateNote, deleteNote, likeNote, fetchCategories } from '../services/noteService';
+import { fetchCommentsByNoteId, postComment } from '../services/commentService';
 
 
 const NoteDetails = () => {
@@ -26,16 +28,11 @@ const NoteDetails = () => {
   const fetchNoteAndComments = async () => {
     setLoading(true);
     try {
-      const notesRes = await axios.get(`${API_BASE_URL}/notes/getFiles?ts=${Date.now()}`);
-      console.log('GET /notes/getFiles? response:', notesRes.data);
-      console.log('Current note id:', id);
-      console.log('All note ids:', notesRes.data.map(n => n._id));
-      const foundNote = notesRes.data.find(n => n._id === id);
+      const foundNote = await fetchNoteById(id);
       setNote(foundNote);
-      console.log('Fetched note:', foundNote);
       if (foundNote) {
-        const commentsRes = await axios.get(`${API_BASE_URL}/comments/${foundNote._id}`);
-        setComments(commentsRes.data);
+        const comments = await fetchCommentsByNoteId(foundNote._id);
+        setComments(comments);
       } else {
         setComments([]);
       }
@@ -48,7 +45,7 @@ const NoteDetails = () => {
 
   useEffect(() => {
     fetchNoteAndComments();
-    axios.get("http://localhost:6969/categories").then(res => setCategories(res.data));
+    fetchCategories().then(setCategories);
     // eslint-disable-next-line
   }, [id]);
 
@@ -67,8 +64,7 @@ const NoteDetails = () => {
     if (!user?._id) return alert("Login to like notes");
     setLikeLoading(true);
     const liked = note.likes?.includes(user._id);
-    const url = `${API_BASE_URL}/notes/${note._id}/${liked ? "unlike" : "like"}`;
-    await axios.post(url, { userId: user._id });
+    await likeNote(note._id, user._id, liked);
     await fetchNoteAndComments();
     setLikeLoading(false);
   };
@@ -77,9 +73,9 @@ const NoteDetails = () => {
     e.preventDefault();
     if (!user?._id) return alert("Login to comment");
     if (!newComment.trim()) return;
-    await axios.post(`${API_BASE_URL}/comments/${note._id}`, { userId: user._id, text: newComment });
-    const commentsRes = await axios.get(`${API_BASE_URL}/comments/${note._id}`);
-    setComments(commentsRes.data);
+    await postComment(note._id, user._id, newComment);
+    const comments = await fetchCommentsByNoteId(note._id);
+    setComments(comments);
     setNewComment("");
     await fetchNoteAndComments();
   };
@@ -97,9 +93,7 @@ const NoteDetails = () => {
     e.preventDefault();
     setEditLoading(true);
     setEditError('');
-    console.log('Submitting editForm:', editForm);
     try {
-      // Only send changed fields
       const updateObj = {};
       if (editForm.fileName !== note.fileName) updateObj.fileName = editForm.fileName;
       if (editForm.fileDescription !== note.fileDescription) updateObj.fileDescription = editForm.fileDescription;
@@ -110,7 +104,7 @@ const NoteDetails = () => {
         setEditLoading(false);
         return;
       }
-      await axios.put(`${API_BASE_URL}/notes/${note._id}`, updateObj);
+      await updateNote(note._id, updateObj);
       setEditMode(false);
       await fetchNoteAndComments();
     } catch (err) {
@@ -124,7 +118,7 @@ const NoteDetails = () => {
     setDeleteLoading(true);
     setDeleteError('');
     try {
-      await axios.delete(`${API_BASE_URL}/notes/${note._id}`);
+      await deleteNote(note._id);
       navigate('/notes');
     } catch (err) {
       setDeleteError(err.response?.data?.error || 'Failed to delete note');

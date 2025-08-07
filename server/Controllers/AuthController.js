@@ -23,7 +23,7 @@ const signup = async (req, res) => {
 
         const existingUser = await User.findOne({ userEmail });
         if (existingUser) {
-            res.status(401).send("User Already Exists with this email");
+            return res.status(401).send("User Already Exists with this email");
         }
 
         // Check if file is provided

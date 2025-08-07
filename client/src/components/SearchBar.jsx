@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import API_BASE_URL from '../config/api.js';
+import { searchNotes } from '../services/noteService';
 
 
 const SearchBar = () => {
@@ -17,16 +18,10 @@ const SearchBar = () => {
 
   const handleSearch = async (e) => {
     e.preventDefault();
-
     try {
-      const notes = await axios.get("${API_BASE_URL}/notes/getFiles", {
-        params: {
-          title: searchQuery,
-        },
-      });
-
-      if (notes.data.data.length > 0) {
-        setSearchResults(notes.data.data);
+      const results = await searchNotes(searchQuery);
+      if (results.length > 0) {
+        setSearchResults(results);
         setSearchStatus("Found");
       } else {
         setSearchResults([]);

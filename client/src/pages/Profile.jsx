@@ -4,6 +4,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import NoteCard from "../components/NoteCard";
 import API_BASE_URL from '../config/api.js';
+import { updateUserProfile, uploadProfileImage } from '../services/userService';
+import { fetchAllComments } from '../services/commentService';
 
 
 const Profile = () => {
@@ -160,24 +162,13 @@ const Profile = () => {
     e.preventDefault();
     setProfileLoading(true);
     setProfileError('');
-    
     try {
       let updateData = { ...form };
-      
-      // If image is selected, upload it first
       if (selectedImage) {
-        const formData = new FormData();
-        formData.append('image', selectedImage);
-        
-        const imageRes = await axios.post(`${API_BASE_URL}/upload-image`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-        
-        updateData.profileImage = imageRes.data.imageUrl;
+        updateData.profileImage = await uploadProfileImage(selectedImage);
       }
-      
-      const res = await axios.put(`${API_BASE_URL}/authors/${user._id}`, updateData);
-      dispatch({ type: 'user/setUserData', payload: res.data });
+      const res = await updateUserProfile(user._id, updateData);
+      dispatch({ type: 'user/setUserData', payload: res });
       setEditMode(false);
       setSelectedImage(null);
       setImagePreview(null);

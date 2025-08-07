@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -6,10 +6,13 @@ import {
   markAsRead, 
   markAllAsRead,
   setLoading,
-  setError 
+  setError,
+  addNotification,
+  setUnreadCount
 } from '../Redux/slices/notifications-slice';
 import { notificationService } from '../services/notificationService';
 import NotificationIcon from '../components/NotificationIcon';
+import { io } from 'socket.io-client';
 
 const NotificationsPage = () => {
   const dispatch = useDispatch();
@@ -21,10 +24,48 @@ const NotificationsPage = () => {
   
   const [filter, setFilter] = useState('all'); // all, unread, messages, comments, likes
 
+  const socketRef = useRef(null);
+
+  // Connect to socket for real-time notifications
   useEffect(() => {
-    if (user?._id) {
-      loadNotifications();
-    }
+    if (!user?._id) return;
+    
+    // Initialize socket connection
+    socketRef.current = io(notificationService.socketUrl, {
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 5,
+      path: '/socket.io'
+    });
+
+    // Join user's room
+    socketRef.current.emit('join', user._id);
+    
+    // Subscribe to notifications
+    socketRef.current.emit('subscribe_notifications', user._id);
+    
+    // Listen for new notifications
+    socketRef.current.on('notification_received', (notification) => {
+      console.log('Received real-time notification in NotificationsPage:', notification);
+      dispatch(addNotification(notification));
+    });
+    
+    // Listen for unread count updates
+    socketRef.current.on('notification_count', ({ count }) => {
+      console.log('Received notification count update in NotificationsPage:', count);
+      dispatch(setUnreadCount(count));
+    });
+    
+    // Load initial notifications
+    loadNotifications();
+    
+    // Clean up on unmount
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
   }, [user?._id]);
 
   const loadNotifications = async () => {
@@ -281,4 +322,4 @@ const NotificationsPage = () => {
   );
 };
 
-export default NotificationsPage; 
+export default NotificationsPage;
