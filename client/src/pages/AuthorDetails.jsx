@@ -20,7 +20,7 @@ const AuthorDetails = () => {
         // Use the correct endpoint for getting author profile
         const authorRes = await axios.get(`${API_BASE_URL}/authors/${id}`);
         const authorData = authorRes.data;
-        
+
         // Set author data (the API returns { user, notes })
         setAuthor(authorData.user);
         setNotes(authorData.notes || []);
@@ -31,7 +31,7 @@ const AuthorDetails = () => {
       }
       setLoading(false);
     };
-    
+
     if (id) {
       fetchAuthorAndNotes();
     }
@@ -75,7 +75,7 @@ const AuthorDetails = () => {
           <div className="text-xs text-gray-500">{author.userBio}</div>
           <button
             className="mt-3 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
-            onClick={() => navigate(`/inbox`)}
+            onClick={() => navigate(`/inbox?authorId=${author._id}`)}
           >
             Chat with Author
           </button>
@@ -120,7 +120,7 @@ const AuthorDetails = () => {
                 <div className={`flex gap-12 w-full justify-start overflow-hidden`}>
                   {visibleNotes.map(note => (
                     <div key={note._id} className="flex-shrink-0" style={{ width: 320 }}>
-                      <NoteCard note={{...note, showCategory:true}} />
+                      <NoteCard note={{ ...note, showCategory: true }} />
                     </div>
                   ))}
                 </div>

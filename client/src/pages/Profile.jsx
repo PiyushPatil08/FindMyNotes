@@ -6,6 +6,9 @@ import NoteCard from "../components/NoteCard";
 import API_BASE_URL from '../config/api.js';
 import { updateUserProfile, uploadProfileImage } from '../services/userService';
 import { fetchAllComments } from '../services/commentService';
+import { setUserData } from '../Redux/slices/user-slice';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const Profile = () => {
@@ -14,13 +17,8 @@ const Profile = () => {
   const [likedNotes, setLikedNotes] = useState([]);
   const [comments, setComments] = useState([]);
   const navigate = useNavigate();
-  const [editMode, setEditMode] = useState(false);
-  const [form, setForm] = useState({ userName: user?.userName || '', userBio: user?.userBio || '', userEmail: user?.userEmail || '', userMobile: user?.userMobile || '' });
-  const [profileLoading, setProfileLoading] = useState(false);
-  const [profileError, setProfileError] = useState('');
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const dispatch = useDispatch();
+
+
   const [uploadedIdx, setUploadedIdx] = useState(0);
 
   useEffect(() => {
@@ -113,7 +111,7 @@ const Profile = () => {
                 <div className={`flex gap-12 w-full justify-start overflow-hidden`}>
                   {visibleNotes.map(note => (
                     <div key={note._id} className="flex-shrink-0" style={{ width: 320 }}>
-                      <NoteCard note={{...note, showCategory:true}} />
+                      <NoteCard note={{ ...note, showCategory: true }} />
                     </div>
                   ))}
                 </div>
@@ -135,93 +133,21 @@ const Profile = () => {
     </div>
   );
 
-  const handleEditProfile = () => {
-    setForm({ userName: user?.userName || '', userBio: user?.userBio || '', userEmail: user?.userEmail || '', userMobile: user?.userMobile || '' });
-    setSelectedImage(null);
-    setImagePreview(null);
-    setEditMode(true);
-  };
 
-  const handleProfileChange = e => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedImage(file);
-      const reader = new FileReader();
-      reader.onload = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleProfileSubmit = async e => {
-    e.preventDefault();
-    setProfileLoading(true);
-    setProfileError('');
-    try {
-      let updateData = { ...form };
-      if (selectedImage) {
-        updateData.profileImage = await uploadProfileImage(selectedImage);
-      }
-      const res = await updateUserProfile(user._id, updateData);
-      dispatch({ type: 'user/setUserData', payload: res });
-      setEditMode(false);
-      setSelectedImage(null);
-      setImagePreview(null);
-    } catch (err) {
-      setProfileError(err.response?.data?.error || 'Failed to update profile');
-    }
-    setProfileLoading(false);
-  };
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8">
       <div className="flex items-center gap-6 mb-8">
-        <img src={user?.profileImage || '/logo.png'} alt="avatar" className="h-20 w-20 rounded-full object-cover border" />
+        <img src={user?.profileImage?.startsWith('http') ? user.profileImage : (user?.profileImage ? `${API_BASE_URL}/images/${user.profileImage}` : '/logo.png')} alt="avatar" className="h-20 w-20 rounded-full object-cover border" />
         <div>
           <div className="text-2xl font-bold">{user?.userName}</div>
           <div className="text-gray-600">{user?.userEmail}</div>
           <div className="text-gray-500 text-sm">{user?.userBio}</div>
-          <button className="mt-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs" onClick={handleEditProfile}>Edit Profile</button>
+
+          <button className="mt-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs" onClick={() => navigate("/profile/edit")}>Edit Profile</button>
         </div>
       </div>
-      {editMode && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <form className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md space-y-3 relative" onSubmit={handleProfileSubmit}>
-            <button type="button" className="absolute top-2 right-2 text-gray-400 hover:text-gray-700" onClick={() => setEditMode(false)}>&times;</button>
-            <h2 className="text-lg font-bold mb-2">Edit Profile</h2>
-            
-            {/* Profile Image Upload */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Profile Image</label>
-              <div className="flex items-center space-x-4">
-                <img 
-                  src={imagePreview || user?.profileImage || '/logo.png'} 
-                  alt="Profile preview" 
-                  className="h-16 w-16 rounded-full object-cover border"
-                />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                />
-              </div>
-            </div>
-            
-            <input name="userName" value={form.userName} onChange={handleProfileChange} className="w-full border rounded px-2 py-1" placeholder="Name" required />
-            <input name="userEmail" value={form.userEmail} onChange={handleProfileChange} className="w-full border rounded px-2 py-1" placeholder="Email" required />
-            <input name="userMobile" value={form.userMobile} onChange={handleProfileChange} className="w-full border rounded px-2 py-1" placeholder="Mobile" />
-            <textarea name="userBio" value={form.userBio} onChange={handleProfileChange} className="w-full border rounded px-2 py-1" placeholder="Bio" />
-            {profileError && <div className="text-red-500 text-sm">{profileError}</div>}
-            <button type="submit" className="bg-blue-500 text-white px-4 py-1.5 rounded hover:bg-blue-600 w-full" disabled={profileLoading}>{profileLoading ? 'Saving...' : 'Save Changes'}</button>
-          </form>
-        </div>
-      )}
+
       <h2 className="text-xl font-bold mb-2">Your Uploaded Notes</h2>
       <div className="flex gap-8 overflow-x-auto scrollbar-hide py-2 px-1 w-full mb-8">
         {notes.length === 0 ? (
@@ -229,7 +155,7 @@ const Profile = () => {
         ) : (
           notes.map(note => (
             <div key={note._id} className="flex-shrink-0 w-[280px] md:w-[320px]">
-              <NoteCard note={{...note, showCategory:true}} />
+              <NoteCard note={{ ...note, showCategory: true }} />
             </div>
           ))
         )}
@@ -241,11 +167,12 @@ const Profile = () => {
         ) : (
           likedNotes.map(note => (
             <div key={note._id} className="flex-shrink-0 w-[280px] md:w-[320px]">
-              <NoteCard note={{...note, showCategory:true}} />
+              <NoteCard note={{ ...note, showCategory: true }} />
             </div>
           ))
         )}
       </div>
+      <ToastContainer position="top-center" autoClose={2000} hideProgressBar={true} />
     </div>
   );
 };

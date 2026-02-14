@@ -3,37 +3,43 @@ const mongoose = require("mongoose");
 const userSchema = mongoose.Schema({
     firstName: {
         type: String,
-        required: true,
+        required: [true, "First name is required"],
+        trim: true,
     },
     lastName: {
         type: String,
-        required: true,
+        required: [true, "Last name is required"],
+        trim: true,
     },
     userBio: {
         type: String,
-        required: true,
+        default: "",
+        trim: true,
     },
     userEmail: {
         type: String,
-        required: true,
+        required: [true, "Email is required"],
         unique: true,
+        trim: true,
+        lowercase: true,
     },
     userMobile: {
         type: Number,
-        required: true,
+        default: null,
     },
     userName: {
         type: String,
-        required: true,
+        required: [true, "Username is required"],
         unique: true,
+        trim: true,
     },
     userPassword: {
         type: String,
-        required: true,
+        required: [true, "Password is required"],
     },
     profileImage: {
         type: String,
-        required: true,
+        default: "",
     },
     createdAt: {
         type: Date,

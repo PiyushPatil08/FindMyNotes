@@ -1,5 +1,6 @@
 const User = require('../Models/User');
 const Notes = require('../Models/Notes');
+const { deleteFromCloudinary } = require('../utils/uploadHelper');
 
 // Get all authors (users), with optional search
 exports.getAllAuthors = async (req, res) => {
@@ -56,6 +57,17 @@ exports.updateUserProfile = async (req, res) => {
     try {
         const { id } = req.params;
         const updateFields = req.body;
+
+        // If profile image is being updated, delete the old one
+        if (updateFields.profileImage) {
+            const currentUser = await User.findById(id);
+            if (currentUser && currentUser.profileImage &&
+                currentUser.profileImage !== updateFields.profileImage &&
+                currentUser.profileImage.includes('cloudinary')) {
+                await deleteFromCloudinary(currentUser.profileImage, 'image');
+            }
+        }
+
         // Optionally, validate fields here
         const updatedUser = await User.findByIdAndUpdate(id, updateFields, { new: true }).select('-userPassword');
         res.json(updatedUser);

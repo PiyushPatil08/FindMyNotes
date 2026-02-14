@@ -40,6 +40,14 @@ const NoteSchema = mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    publicId: {
+        type: String,
+        required: false
+    },
+    originalFileName: {
+        type: String,
+        required: false
     }
 });
 

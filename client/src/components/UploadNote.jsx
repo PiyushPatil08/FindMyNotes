@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import API_BASE_URL from '../config/api.js';
 
 
@@ -18,6 +20,7 @@ const UploadNote = ({ editNote, onSuccess }) => {
   const [thumbnail, setThumbnail] = useState(null);
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
   const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     axios.get(`${API_BASE_URL}/categories`).then(res => setCategories(res.data));
@@ -38,7 +41,10 @@ const UploadNote = ({ editNote, onSuccess }) => {
   const submitFile = async (e) => {
     try {
       e.preventDefault();
-      if (!userId) return alert("Login required");
+      if (!userId) return toast.error("Please login to upload notes");
+      if (!file && !editNote) return toast.error("Please select a PDF file to upload");
+
+      setIsSubmitting(true);
       const formData = new FormData();
       formData.append("title", title);
       formData.append("description", description);
@@ -56,13 +62,32 @@ const UploadNote = ({ editNote, onSuccess }) => {
       const res = await axios[method](url, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      if (!editNote && res.data && res.data._id) {
-        navigate(`/notes/${res.data._id}`);
-      } else if (onSuccess) {
-        onSuccess();
+
+      if (editNote) {
+        toast.success("Note updated successfully!");
+        if (onSuccess) onSuccess();
+      } else {
+        toast.success("Note uploaded successfully!");
+        // Clear form
+        setTitle("");
+        setDescription("");
+        setTags([]);
+        setTagInput("");
+        setFile(null);
+        setCategory("");
+        setThumbnail(null);
+        setThumbnailPreview(null);
+        // Navigate to the new note after a brief delay
+        if (res.data && res.data._id) {
+          setTimeout(() => navigate(`/notes/${res.data._id}`), 1500);
+        }
       }
     } catch (error) {
+      const message = error.response?.data?.error || "Failed to upload note. Please try again.";
+      toast.error(message);
       console.log("Failed to submit file: ", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -75,7 +100,7 @@ const UploadNote = ({ editNote, onSuccess }) => {
         <h1 className="text-3xl font-extrabold text-gray-800 text-center">
           {editNote ? "Edit Note" : "Upload Your Notes"}
         </h1>
-  
+
         {/* Title */}
         <input
           type="text"
@@ -85,7 +110,7 @@ const UploadNote = ({ editNote, onSuccess }) => {
           onChange={(e) => setTitle(e.target.value)}
           className="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 text-sm text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
         />
-  
+
         {/* Description */}
         <textarea
           placeholder="Description"
@@ -95,7 +120,7 @@ const UploadNote = ({ editNote, onSuccess }) => {
           onChange={(e) => setDescription(e.target.value)}
           className="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 text-sm text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
         ></textarea>
-  
+
         {/* Category */}
         <div>
           <label className="block mb-1 text-sm font-medium text-gray-700">
@@ -117,7 +142,7 @@ const UploadNote = ({ editNote, onSuccess }) => {
             ))}
           </select>
         </div>
-  
+
         {/* Tags */}
         <div>
           <label className="block mb-1 text-sm font-medium text-gray-700">
@@ -157,7 +182,7 @@ const UploadNote = ({ editNote, onSuccess }) => {
             </button>
           </div>
         </div>
-  
+
         {/* Thumbnail */}
         <div>
           <label className="block mb-1 text-sm font-medium text-gray-700">
@@ -182,7 +207,7 @@ const UploadNote = ({ editNote, onSuccess }) => {
             />
           )}
         </div>
-  
+
         {/* File Upload */}
         <div className="w-full">
           <label
@@ -218,14 +243,16 @@ const UploadNote = ({ editNote, onSuccess }) => {
             </div>
           </label>
         </div>
-  
+
         <button
           type="submit"
-          className="w-full rounded-xl bg-blue-600 py-3 text-base font-bold text-white transition hover:bg-blue-700"
+          disabled={isSubmitting}
+          className="w-full rounded-xl bg-blue-600 py-3 text-base font-bold text-white transition hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {editNote ? "Update Note" : "Submit Note"}
+          {isSubmitting ? (editNote ? "Updating..." : "Uploading...") : (editNote ? "Update Note" : "Submit Note")}
         </button>
       </form>
+      <ToastContainer position="top-center" autoClose={2500} hideProgressBar={true} />
     </div>
   );
 };

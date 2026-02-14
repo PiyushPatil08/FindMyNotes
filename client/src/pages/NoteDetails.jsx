@@ -4,8 +4,10 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import { HeartIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import API_BASE_URL from '../config/api.js';
-import { fetchNoteById, updateNote, deleteNote, likeNote, fetchCategories } from '../services/noteService';
+import { fetchNoteById, deleteNote, likeNote, fetchCategories } from '../services/noteService';
 import { fetchCommentsByNoteId, postComment } from '../services/commentService';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const NoteDetails = () => {
@@ -17,10 +19,7 @@ const NoteDetails = () => {
   const [newComment, setNewComment] = useState("");
   const [likeLoading, setLikeLoading] = useState(false);
   const navigate = useNavigate();
-  const [editMode, setEditMode] = useState(false);
-  const [editForm, setEditForm] = useState({ fileName: '', fileDescription: '', tags: '', category: '' });
-  const [editLoading, setEditLoading] = useState(false);
-  const [editError, setEditError] = useState('');
+
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState('');
   const [categories, setCategories] = useState([]);
@@ -49,16 +48,7 @@ const NoteDetails = () => {
     // eslint-disable-next-line
   }, [id]);
 
-  useEffect(() => {
-    if (note && user?._id === note.uploadedBy?._id) {
-      setEditForm({
-        fileName: note.fileName || '',
-        fileDescription: note.fileDescription || '',
-        tags: note.tags ? note.tags.join(', ') : '',
-        category: note.category || ''
-      });
-    }
-  }, [note, user]);
+
 
   const handleLike = async () => {
     if (!user?._id) return alert("Login to like notes");
@@ -80,38 +70,7 @@ const NoteDetails = () => {
     await fetchNoteAndComments();
   };
 
-  const handleEditNote = () => {
-    setEditError('');
-    setEditMode(true);
-  };
 
-  const handleEditChange = e => {
-    setEditForm({ ...editForm, [e.target.name]: e.target.value });
-  };
-
-  const handleEditSubmit = async e => {
-    e.preventDefault();
-    setEditLoading(true);
-    setEditError('');
-    try {
-      const updateObj = {};
-      if (editForm.fileName !== note.fileName) updateObj.fileName = editForm.fileName;
-      if (editForm.fileDescription !== note.fileDescription) updateObj.fileDescription = editForm.fileDescription;
-      if (editForm.tags.split(',').map(t => t.trim()).join(',') !== (note.tags || []).join(',')) updateObj.tags = editForm.tags.split(',').map(t => t.trim());
-      if (editForm.category !== note.category) updateObj.category = editForm.category;
-      if (Object.keys(updateObj).length === 0) {
-        setEditMode(false);
-        setEditLoading(false);
-        return;
-      }
-      await updateNote(note._id, updateObj);
-      setEditMode(false);
-      await fetchNoteAndComments();
-    } catch (err) {
-      setEditError(err.response?.data?.error || 'Failed to update note');
-    }
-    setEditLoading(false);
-  };
 
   const handleDeleteNote = async () => {
     if (!window.confirm('Are you sure you want to delete this note?')) return;
@@ -135,7 +94,7 @@ const NoteDetails = () => {
       <div className="bg-white rounded-2xl shadow-lg p-7 mb-8 border border-gray-100 flex flex-col gap-4">
         <div className="flex items-center gap-4 mb-2">
           <img
-            src={note.uploadedBy?.profileImage || '/public/logo.png'}
+            src={note.uploadedBy?.profileImage?.startsWith('http') ? note.uploadedBy.profileImage : (note.uploadedBy?.profileImage ? `${API_BASE_URL}/files/${note.uploadedBy.profileImage}` : '/logo.png')}
             alt="avatar"
             className="h-16 w-16 rounded-full object-cover border-2 border-blue-100 shadow-sm"
           />
@@ -144,13 +103,17 @@ const NoteDetails = () => {
               <div className="text-lg font-bold text-blue-700">{note.uploadedBy?.userName || "Unknown"}</div>
               <button
                 className="ml-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs"
-                onClick={() => navigate(`/inbox`)}
+                onClick={() => {
+                  if (!user?._id) { toast.error('Login to message the author'); return; }
+                  if (user._id === note.uploadedBy?._id) { toast.info('This is your own note'); return; }
+                  navigate(`/inbox?authorId=${note.uploadedBy?._id}`);
+                }}
               >
                 Message Author
               </button>
               {user?._id === note.uploadedBy?._id && (
                 <>
-                  <button className="ml-2 bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 text-xs" onClick={handleEditNote}>Edit</button>
+                  <button className="ml-2 bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 text-xs" onClick={() => navigate(`/notes/${note._id}/edit`)}>Edit</button>
                   <button className="ml-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-xs" onClick={handleDeleteNote} disabled={deleteLoading}>{deleteLoading ? 'Deleting...' : 'Delete'}</button>
                 </>
               )}
@@ -177,7 +140,7 @@ const NoteDetails = () => {
           >
             ❤️ {note.likes?.length || 0}
           </button>
-          <a href={`${API_BASE_URL}/files/${note.files}`} target="_blank" rel="noopener noreferrer" className="bg-blue-500 text-white px-4 py-1.5 rounded-lg hover:bg-blue-600 font-semibold transition">Download PDF</a>
+          <a href={`${API_BASE_URL}/notes/${note._id}/download`} target="_blank" rel="noopener noreferrer" className="bg-blue-500 text-white px-4 py-1.5 rounded-lg hover:bg-blue-600 font-semibold transition">Download PDF</a>
         </div>
       </div>
       <div className="bg-white rounded-xl shadow p-5 border border-gray-100">
@@ -188,7 +151,7 @@ const NoteDetails = () => {
           <div className="max-h-40 overflow-y-auto space-y-2 mb-2">
             {comments.map((c) => (
               <div key={c._id} className="flex items-start gap-2">
-                <img src={c.user?.profileImage || '/public/logo.png'} alt="avatar" className="h-7 w-7 rounded-full object-cover border" />
+                <img src={c.user?.profileImage?.startsWith('http') ? c.user.profileImage : (c.user?.profileImage ? `${API_BASE_URL}/files/${c.user.profileImage}` : '/logo.png')} alt="avatar" className="h-7 w-7 rounded-full object-cover border" />
                 <div>
                   <div className="text-xs font-bold">{c.user?.userName || 'User'}</div>
                   <div className="text-sm text-gray-700">{c.text}</div>
@@ -210,25 +173,8 @@ const NoteDetails = () => {
           <button type="submit" className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600" disabled={!user?._id}>Post</button>
         </form>
       </div>
-      {editMode && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <form className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md space-y-3 relative" onSubmit={handleEditSubmit}>
-            <button type="button" className="absolute top-2 right-2 text-gray-400 hover:text-gray-700" onClick={() => setEditMode(false)}>&times;</button>
-            <h2 className="text-lg font-bold mb-2">Edit Note</h2>
-            <input name="fileName" value={editForm.fileName} onChange={handleEditChange} className="w-full border rounded px-2 py-1" placeholder="Title" required />
-            <textarea name="fileDescription" value={editForm.fileDescription} onChange={handleEditChange} className="w-full border rounded px-2 py-1" placeholder="Description" required />
-            <input name="tags" value={editForm.tags} onChange={handleEditChange} className="w-full border rounded px-2 py-1" placeholder="Tags (comma separated)" />
-            <select name="category" value={editForm.category} onChange={handleEditChange} className="w-full border rounded px-2 py-1" required>
-              <option value="" disabled>Select category</option>
-              {categories.map((cat, idx) => (
-                <option key={cat.name + idx} value={cat.name}>{cat.name}</option>
-              ))}
-            </select>
-            {editError && <div className="text-red-500 text-sm">{editError}</div>}
-            <button type="submit" className="bg-blue-500 text-white px-4 py-1.5 rounded hover:bg-blue-600 w-full" disabled={editLoading}>{editLoading ? 'Saving...' : 'Save Changes'}</button>
-          </form>
-        </div>
-      )}
+
+      <ToastContainer position="top-center" autoClose={2000} hideProgressBar={true} />
     </div>
   );
 };

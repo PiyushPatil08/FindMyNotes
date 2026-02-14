@@ -7,10 +7,10 @@ export const fetchNotes = async () => {
   return response.data;
 };
 
-// Fetch a single note by ID (by filtering all notes, as in NoteDetails)
+// Fetch a single note by ID
 export const fetchNoteById = async (id) => {
-  const notes = await fetchNotes();
-  return notes.find(n => n._id === id);
+  const response = await axios.get(`${API_BASE_URL}/notes/${id}`);
+  return response.data;
 };
 
 // Update a note by ID

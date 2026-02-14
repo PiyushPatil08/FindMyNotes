@@ -11,6 +11,7 @@ import Faq from "./pages/Faq";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Contact from "./pages/Contact";
 import Footer from "./components/Footer";
 import { useSelector } from "react-redux";
 
@@ -21,6 +22,8 @@ const AuthorDetails = React.lazy(() => import("./pages/AuthorDetails.jsx"));
 const NoteDetails = React.lazy(() => import("./pages/NoteDetails.jsx"));
 const InboxPage = React.lazy(() => import("./pages/InboxPage.jsx"));
 const NotificationsPage = React.lazy(() => import("./pages/NotificationsPage.jsx"));
+const EditNote = React.lazy(() => import("./pages/EditNote"));
+const EditProfile = React.lazy(() => import("./pages/EditProfile"));
 
 const App = () => {
   const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
@@ -40,6 +43,8 @@ const App = () => {
               <>
                 <Route path="/upload" element={<Upload />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/profile/edit" element={<EditProfile />} />
+                <Route path="/notes/:id/edit" element={<EditNote />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
               </>
@@ -51,6 +56,7 @@ const App = () => {
             )}
             <Route path="/about" element={<About />} />
             <Route path="/faq" element={<Faq />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/inbox" element={<InboxPage />} />
           </Routes>
         </React.Suspense>

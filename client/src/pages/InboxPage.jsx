@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 import API_BASE_URL from '../config/api.js';
 import { useRef } from "react";
 import { io } from "socket.io-client";
@@ -34,7 +35,7 @@ const ChatWindow = ({ conversation, user }) => {
   // Connect to socket
   useEffect(() => {
     if (!user?._id) return;
-    
+
     socketRef.current = io(SOCKET_URL, {
       reconnection: true,
       reconnectionDelay: 1000,
@@ -62,7 +63,7 @@ const ChatWindow = ({ conversation, user }) => {
   // Load messages
   useEffect(() => {
     if (!conversation?._id || !user?._id) return;
-    
+
     const loadMessages = async () => {
       setLoading(true);
       try {
@@ -74,9 +75,9 @@ const ChatWindow = ({ conversation, user }) => {
         setLoading(false);
       }
     };
-    
+
     loadMessages();
-    
+
     // Join conversation room
     if (socketRef.current) {
       socketRef.current.emit('join_conversation', {
@@ -84,10 +85,10 @@ const ChatWindow = ({ conversation, user }) => {
         conversationId: conversation._id
       });
     }
-    
+
     // Set up polling for new messages as a fallback
     const messagePollingInterval = setInterval(loadMessages, 10000); // Poll every 10 seconds
-    
+
     return () => {
       clearInterval(messagePollingInterval);
     };
@@ -116,7 +117,7 @@ const ChatWindow = ({ conversation, user }) => {
         timestamp: new Date()
       };
       handleNewMessage(tempMessage);
-      
+
       // Try to send via HTTP
       sendMessage(sender, receiver, content)
         .then(response => {
@@ -127,9 +128,9 @@ const ChatWindow = ({ conversation, user }) => {
         .catch(err => {
           console.error('Failed to send message via HTTP fallback:', err);
           // Update the temporary message to show failure
-          setMessages(prev => prev.map(m => 
-            m._id === tempMessage._id 
-              ? {...m, content: content + ' (failed to send)'}
+          setMessages(prev => prev.map(m =>
+            m._id === tempMessage._id
+              ? { ...m, content: content + ' (failed to send)' }
               : m
           ));
         });
@@ -157,7 +158,7 @@ const ChatWindow = ({ conversation, user }) => {
   const handleSend = async (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
-    
+
     const messageData = {
       sender: user._id,
       receiver: conversation._id,
@@ -191,9 +192,9 @@ const ChatWindow = ({ conversation, user }) => {
     <div className="flex flex-col h-full">
       {/* Chat header */}
       <div className="flex items-center gap-4 p-4 border-b">
-        <img 
-          src={conversation?.profileImage || "/logo.png"} 
-          alt="avatar" 
+        <img
+          src={conversation?.profileImage || "/logo.png"}
+          alt="avatar"
           className="h-10 w-10 rounded-full"
         />
         <div>
@@ -207,10 +208,10 @@ const ChatWindow = ({ conversation, user }) => {
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4">
         {messages.map((msg) => (
-          <Message 
-            key={msg._id} 
-            message={msg} 
-            isOwn={msg.sender._id === user._id} 
+          <Message
+            key={msg._id}
+            message={msg}
+            isOwn={msg.sender._id === user._id}
           />
         ))}
         <div ref={messagesEndRef} />
@@ -249,11 +250,13 @@ const InboxPage = () => {
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const authorIdParam = searchParams.get('authorId');
 
   // Get conversations using the messageService
   useEffect(() => {
     if (!user?._id) return;
-    
+
     let interval;
     const fetchInbox = async () => {
       setLoading(true);
@@ -276,13 +279,49 @@ const InboxPage = () => {
         setLoading(false);
       }
     };
-    
+
     fetchInbox();
     // Polling interval as fallback if socket updates fail
     interval = setInterval(fetchInbox, 10000); // Every 10 seconds
-    
+
     return () => clearInterval(interval);
-  }, [user, selected]);
+  }, [user]);
+
+  // Auto-open conversation when authorId is in URL
+  useEffect(() => {
+    if (!authorIdParam || !user?._id) return;
+
+    // Check if author is already in conversations list
+    const existing = conversations.find(u => u._id === authorIdParam);
+    if (existing) {
+      setSelected(existing);
+      // Clear the query param so it doesn't re-trigger
+      setSearchParams({}, { replace: true });
+      return;
+    }
+
+    // Author not in conversations — fetch their profile and select them
+    const fetchAuthorAndSelect = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/authors/${authorIdParam}`);
+        const authorUser = res.data.user;
+        if (authorUser) {
+          // Add to conversations list if not already there
+          setConversations(prev => {
+            if (prev.some(u => u._id === authorUser._id)) return prev;
+            return [authorUser, ...prev];
+          });
+          setSelected(authorUser);
+        }
+      } catch (err) {
+        console.error('Failed to fetch author for chat:', err);
+      }
+      // Clear the query param
+      setSearchParams({}, { replace: true });
+    };
+
+    fetchAuthorAndSelect();
+  }, [authorIdParam, conversations, user]);
 
   // Search all users/authors
   useEffect(() => {
