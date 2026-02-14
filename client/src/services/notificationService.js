@@ -1,13 +1,13 @@
 import axios from 'axios';
 import API_BASE_URL from '../config/api.js';
 
-// Use the same base URL for socket connection but without the /api path
-const SOCKET_URL = API_BASE_URL.replace('/api', '');
+// Use environment variable for socket URL
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
 
 export const notificationService = {
   // Socket URL for real-time notifications
   socketUrl: SOCKET_URL,
-  
+
   // Get all notifications for a user
   getNotifications: async (userId) => {
     try {
@@ -68,14 +68,14 @@ export const notificationService = {
     try {
       const response = await axios.get(`${API_BASE_URL}/notifications/${userId}`);
       const notifications = response.data;
-      
+
       if (lastNotificationId && notifications.length > 0) {
-        const newNotifications = notifications.filter(n => 
+        const newNotifications = notifications.filter(n =>
           n._id !== lastNotificationId && !n.read
         );
         return newNotifications;
       }
-      
+
       return notifications.filter(n => !n.read);
     } catch (error) {
       console.error('Error polling notifications:', error);

@@ -8,15 +8,15 @@ import { addNotification, setUnreadCount } from '../Redux/slices/notifications-s
 import { io } from 'socket.io-client';
 import API_BASE_URL from '../config/api.js';
 
-// Use the same base URL for socket connection but without the /api path
-const SOCKET_URL = API_BASE_URL.replace('/api', '');
+// Use environment variable for socket URL
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
 
 const LiveNotifications = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(state => state.user.userData);
   const socketRef = useRef(null);
-  
+
   const {
     notifications,
     unreadCount,
@@ -29,7 +29,7 @@ const LiveNotifications = () => {
   // Connect to socket for real-time notifications
   useEffect(() => {
     if (!user?._id) return;
-    
+
     // Initialize socket connection
     socketRef.current = io(SOCKET_URL, {
       reconnection: true,
@@ -41,15 +41,15 @@ const LiveNotifications = () => {
 
     // Join user's room
     socketRef.current.emit('join', user._id);
-    
+
     // Subscribe to notifications
     socketRef.current.emit('subscribe_notifications', user._id);
-    
+
     // Listen for new notifications
     socketRef.current.on('notification_received', (notification) => {
       console.log('Received real-time notification:', notification);
       dispatch(addNotification(notification));
-      
+
       // Show toast notification
       const toastMessage = getToastMessage(notification);
       toast.info(toastMessage, {
@@ -63,13 +63,13 @@ const LiveNotifications = () => {
         onClose: () => clearLastNotificationState()
       });
     });
-    
+
     // Listen for unread count updates
     socketRef.current.on('notification_count', ({ count }) => {
       console.log('Received notification count update:', count);
       dispatch(setUnreadCount(count));
     });
-    
+
     // Clean up on unmount
     return () => {
       if (socketRef.current) {
@@ -77,7 +77,7 @@ const LiveNotifications = () => {
       }
     };
   }, [user?._id, dispatch, clearLastNotificationState]);
-  
+
   // Handle new notifications with toast (for non-socket notifications)
   useEffect(() => {
     if (lastNotification) {
@@ -106,7 +106,7 @@ const LiveNotifications = () => {
   const handleNotificationClick = (notification) => {
     // Mark as read
     markNotificationAsRead(notification._id);
-    
+
     // Navigate based on notification type
     switch (notification.type) {
       case 'message':
@@ -141,10 +141,10 @@ const LiveNotifications = () => {
         aria-label="View all notifications"
         title="View all notifications"
       >
-        <NotificationIconWithBadge 
-          type="notification" 
+        <NotificationIconWithBadge
+          type="notification"
           unreadCount={unreadCount}
-          className="w-6 h-6" 
+          className="w-6 h-6"
         />
       </button>
     </div>

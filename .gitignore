@@ -99,3 +99,4 @@ Thumbs.db
 # Uploaded files (optional - remove if you want to track them)
 server/files/
 server/images/ 
+server/backup/

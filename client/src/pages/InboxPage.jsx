@@ -7,8 +7,8 @@ import { useRef } from "react";
 import { io } from "socket.io-client";
 import { fetchMessages, sendMessage, getInbox } from '../services/messageService';
 
-// Use the same base URL for socket connection but without the /api path
-const SOCKET_URL = API_BASE_URL.replace('/api', '');
+// Use environment variable for socket URL
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
 
 const Message = ({ message, isOwn }) => {
   return (
