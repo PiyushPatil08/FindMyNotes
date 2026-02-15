@@ -39,6 +39,6 @@ export const searchNotes = async (title) => {
 
 // Fetch categories
 export const fetchCategories = async () => {
-  const response = await axios.get("http://localhost:6969/categories");
+  const response = await axios.get(`${API_BASE_URL}/categories`);
   return response.data;
 };
