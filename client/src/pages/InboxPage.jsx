@@ -353,7 +353,6 @@ const InboxPage = () => {
     setSearch("");
     setSearchResults([]);
   };
-import { logo } from "../config/assets";
 
   return (
     <div className="container mx-auto px-2 py-8 flex flex-col md:flex-row h-[80vh] gap-4">
