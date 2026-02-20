@@ -18,24 +18,30 @@ const PORT = process.env.PORT || 6969;
 dotenv.config();
 
 // CORS setup
-// CORS setup
-const allowedOrigins = [
+// Read allowed origins from environment variable `ALLOWED_ORIGINS`
+// (comma-separated) so you can update allowed frontends without changing code.
+const defaultAllowedOrigins = [
   'https://findmynotes-fawn.vercel.app',
   'https://find-my-notes-psi.vercel.app',
   'http://localhost:5173'
 ];
+
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim()).filter(Boolean)
+  : defaultAllowedOrigins;
 
 app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps, curl, or same-origin)
     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.log('CORS blocked for origin:', origin);
-      callback(null, false);
+    // Support wildcard '*' in env to allow any origin
+    if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+      return callback(null, true);
     }
+
+    console.log('CORS blocked for origin:', origin);
+    return callback(null, false);
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
