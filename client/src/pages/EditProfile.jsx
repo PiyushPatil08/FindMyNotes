@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import API_BASE_URL from '../config/api.js';
+import { logo } from '../config/assets';
 import { updateUserProfile, uploadProfileImage } from '../services/userService';
 import { setUserData } from '../Redux/slices/user-slice';
 
@@ -104,7 +105,7 @@ const EditProfile = () => {
                 <div className="flex flex-col items-center gap-4 mb-2">
                     <div className="relative">
                         <img
-                            src={imagePreview || user.profileImage || '/logo.png'}
+                            src={imagePreview || user.profileImage || logo}
                             alt="Profile preview"
                             className="h-28 w-28 rounded-full object-cover border-4 border-white shadow-md"
                         />

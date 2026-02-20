@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
+import { logo } from "../config/assets";
 
 const Footer = () => (
   <footer className="w-full bg-white border-t border-gray-100 py-8 mt-8">
     <div className="container mx-auto max-w-7xl px-4 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
       {/* Logo and Copyright */}
       <div className="flex items-center gap-3">
-        <img src="/logo.png" alt="FindMyNotes Logo" className="h-10 w-10 rounded-full shadow" />
+        <img src={logo} alt="FindMyNotes Logo" className="h-10 w-10 rounded-full shadow" />
         <span className="text-xl font-heading font-extrabold text-blue-700 tracking-wide">FindMyNotes</span>
         <span className="text-gray-400 text-sm ml-2">&copy; {new Date().getFullYear()} All rights reserved.</span>
       </div>

@@ -9,6 +9,7 @@ import { fetchAllComments } from '../services/commentService';
 import { setUserData } from '../Redux/slices/user-slice';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { logo } from '../config/assets';
 
 
 const Profile = () => {
@@ -138,7 +139,7 @@ const Profile = () => {
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8">
       <div className="flex items-center gap-6 mb-8">
-        <img src={user?.profileImage?.startsWith('http') ? user.profileImage : (user?.profileImage ? `${API_BASE_URL}/images/${user.profileImage}` : '/logo.png')} alt="avatar" className="h-20 w-20 rounded-full object-cover border" />
+        <img src={user?.profileImage?.startsWith('http') ? user.profileImage : (user?.profileImage ? `${API_BASE_URL}/images/${user.profileImage}` : logo)} alt="avatar" className="h-20 w-20 rounded-full object-cover border" />
         <div>
           <div className="text-2xl font-bold">{user?.userName}</div>
           <div className="text-gray-600">{user?.userEmail}</div>

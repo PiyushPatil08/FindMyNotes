@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import API_BASE_URL from '../config/api.js';
+import { logo } from '../config/assets';
 
 
 const NoteCard = ({ note }) => {
@@ -13,7 +14,7 @@ const NoteCard = ({ note }) => {
       {/* Thumbnail */}
       <div className="w-full aspect-[3/2] bg-gray-100 overflow-hidden">
         <img
-          src={note.thumbnail ? (note.thumbnail.startsWith('http') ? note.thumbnail : `${API_BASE_URL}/files/${note.thumbnail}`) : "/logo.png"}
+          src={note.thumbnail ? (note.thumbnail.startsWith('http') ? note.thumbnail : `${API_BASE_URL}/files/${note.thumbnail}`) : logo}
           alt="thumbnail"
           className="object-cover w-full h-full rounded-t-2xl"
         />
@@ -39,7 +40,7 @@ const NoteCard = ({ note }) => {
           {/* Uploader */}
           <div className="flex items-center gap-2">
             <img
-              src={note.uploadedBy?.profileImage?.startsWith('http') ? note.uploadedBy.profileImage : (note.uploadedBy?.profileImage ? `${API_BASE_URL}/files/${note.uploadedBy.profileImage}` : "/logo.png")}
+              src={note.uploadedBy?.profileImage?.startsWith('http') ? note.uploadedBy.profileImage : (note.uploadedBy?.profileImage ? `${API_BASE_URL}/files/${note.uploadedBy.profileImage}` : logo)}
               alt="Uploader"
               className="h-7 w-7 rounded-full border object-cover bg-gray-200"
             />

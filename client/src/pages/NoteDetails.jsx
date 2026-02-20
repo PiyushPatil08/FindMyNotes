@@ -94,7 +94,7 @@ const NoteDetails = () => {
       <div className="bg-white rounded-2xl shadow-lg p-7 mb-8 border border-gray-100 flex flex-col gap-4">
         <div className="flex items-center gap-4 mb-2">
           <img
-            src={note.uploadedBy?.profileImage?.startsWith('http') ? note.uploadedBy.profileImage : (note.uploadedBy?.profileImage ? `${API_BASE_URL}/files/${note.uploadedBy.profileImage}` : '/logo.png')}
+            src={note.uploadedBy?.profileImage?.startsWith('http') ? note.uploadedBy.profileImage : (note.uploadedBy?.profileImage ? `${API_BASE_URL}/files/${note.uploadedBy.profileImage}` : logo)}
             alt="avatar"
             className="h-16 w-16 rounded-full object-cover border-2 border-blue-100 shadow-sm"
           />
@@ -151,7 +151,7 @@ const NoteDetails = () => {
           <div className="max-h-40 overflow-y-auto space-y-2 mb-2">
             {comments.map((c) => (
               <div key={c._id} className="flex items-start gap-2">
-                <img src={c.user?.profileImage?.startsWith('http') ? c.user.profileImage : (c.user?.profileImage ? `${API_BASE_URL}/files/${c.user.profileImage}` : '/logo.png')} alt="avatar" className="h-7 w-7 rounded-full object-cover border" />
+                <img src={c.user?.profileImage?.startsWith('http') ? c.user.profileImage : (c.user?.profileImage ? `${API_BASE_URL}/files/${c.user.profileImage}` : logo)} alt="avatar" className="h-7 w-7 rounded-full object-cover border" />
                 <div>
                   <div className="text-xs font-bold">{c.user?.userName || 'User'}</div>
                   <div className="text-sm text-gray-700">{c.text}</div>

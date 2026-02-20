@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { removeUserData } from "../Redux/slices/user-slice";
 import LiveNotifications from "./LiveNotifications";
+import { logo } from "../config/assets";
 
 const Header = () => {
   const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
@@ -45,7 +46,7 @@ const Header = () => {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 group">
           <img
-            src="/logo.png"
+            src={logo}
             alt="FindMyNotes Logo"
             className="h-10 w-10 rounded-full shadow group-hover:scale-110 transition-transform"
           />
@@ -106,7 +107,7 @@ const Header = () => {
                   className="flex items-center gap-2 cursor-pointer list-none focus:outline-none"
                 >
                   <img
-                    src={user?.profileImage || "/logo.png"}
+                    src={user?.profileImage || logo}
                     alt="Profile"
                     className="h-10 w-10 rounded-full border-2 border-blue-200 object-cover shadow"
                   />

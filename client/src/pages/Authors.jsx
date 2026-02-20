@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import API_BASE_URL from '../config/api.js';
+import { logo } from '../config/assets';
 
 
 const AuthorCard = ({ author }) => (
   <div className="flex flex-col sm:flex-row items-center bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition w-full max-w-2xl mx-auto border border-gray-100 mb-4">
     <img
-      src={author.profileImage || '/logo.png'}
+      src={author.profileImage || logo}
       alt="avatar"
       className="h-20 w-20 rounded-full object-cover border-2 border-blue-100 shadow-sm mb-3 sm:mb-0 sm:mr-6"
     />

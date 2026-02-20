@@ -6,6 +6,7 @@ import API_BASE_URL from '../config/api.js';
 import { useRef } from "react";
 import { io } from "socket.io-client";
 import { fetchMessages, sendMessage, getInbox } from '../services/messageService';
+import { logo } from "../config/assets";
 
 // Use environment variable for socket URL
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
@@ -193,7 +194,7 @@ const ChatWindow = ({ conversation, user }) => {
       {/* Chat header */}
       <div className="flex items-center gap-4 p-4 border-b">
         <img
-          src={conversation?.profileImage || "/logo.png"}
+          src={conversation?.profileImage || logo}
           alt="avatar"
           className="h-10 w-10 rounded-full"
         />
@@ -352,6 +353,7 @@ const InboxPage = () => {
     setSearch("");
     setSearchResults([]);
   };
+import { logo } from "../config/assets";
 
   return (
     <div className="container mx-auto px-2 py-8 flex flex-col md:flex-row h-[80vh] gap-4">
@@ -377,7 +379,7 @@ const InboxPage = () => {
                 className={`flex items-center gap-3 p-2 hover:bg-blue-50 rounded cursor-pointer ${selected && selected._id === u._id ? 'bg-blue-100' : ''}`}
                 onClick={() => handleSelectUser(u)}
               >
-                <img src={u.profileImage || "/public/logo.png"} alt="avatar" className="h-8 w-8 rounded-full object-cover border" />
+                <img src={u.profileImage || logo} alt="avatar" className="h-8 w-8 rounded-full object-cover border" />
                 <div>
                   <div className="font-semibold text-blue-700">{u.userName}</div>
                   <div className="text-xs text-gray-500">{u.userEmail}</div>

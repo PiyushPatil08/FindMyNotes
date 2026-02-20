@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import NoteCard from "../components/NoteCard";
 import API_BASE_URL from '../config/api.js';
+import { logo } from '../config/assets';
 
 
 const AuthorDetails = () => {
@@ -65,7 +66,7 @@ const AuthorDetails = () => {
       <Link to="/authors" className="text-blue-500 hover:underline mb-4 inline-block">&larr; Back to Authors</Link>
       <div className="flex flex-col sm:flex-row items-center bg-white rounded-xl shadow-md p-5 mb-6 border border-gray-100">
         <img
-          src={author.profileImage || '/logo.png'}
+          src={author.profileImage || logo}
           alt="avatar"
           className="h-20 w-20 rounded-full object-cover border-2 border-blue-100 shadow-sm mb-3 sm:mb-0 sm:mr-6"
         />

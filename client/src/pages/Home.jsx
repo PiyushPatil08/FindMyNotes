@@ -1,6 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { bg } from "../config/assets";
 
 export default function Home() {
   const FEATURES = [
@@ -98,7 +99,7 @@ export default function Home() {
           <div className="container mx-auto max-w-5xl overflow-hidden rounded-xl shadow-xl mt-10">
             <div className="aspect-[16/9]">
               <img
-                src="/bg.jpg"
+                src={bg}
                 alt="Students sharing notes"
                 className="w-full h-full object-cover rounded-lg"
               />
