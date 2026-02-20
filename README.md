@@ -24,8 +24,7 @@ A comprehensive, full-stack note-sharing and management platform where users can
 
 ## 🔗 Live Preview
 
-👉 [FindMyNotes Live Site](https://your-frontend-domain.com)  
-*(backend now hosted on Railway at `compassionate-enjoyment-production-ce1d.up.railway.app`)*
+👉 [FindMyNotes Live Site](https://findmynotes-platform.vercel.app/)  
 
 ---
 
