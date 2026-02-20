@@ -24,7 +24,8 @@ A comprehensive, full-stack note-sharing and management platform where users can
 
 ## 🔗 Live Preview
 
-👉 [FindMyNotes on Vercel](https://your-vercel-link.com)
+👉 [FindMyNotes Live Site](https://your-frontend-domain.com)  
+*(backend now hosted on Railway at `compassionate-enjoyment-production-ce1d.up.railway.app`)*
 
 ---
 
@@ -65,7 +66,7 @@ A comprehensive, full-stack note-sharing and management platform where users can
 - 🧰 Component-based architecture with **React 18**
 - 🧩 Responsive UI using **Tailwind CSS**
 - ⚙️ Building full-stack apps with the **MERN stack**
-- 🚀 Deployment via **Vercel** with Vite and serverless functions
+- 🚀 Deployment via **Vercel** (frontend) with Vite and serverless functions; backend now on **Railway**
 
 ---
 
