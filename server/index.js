@@ -21,8 +21,7 @@ dotenv.config();
 // Read allowed origins from environment variable `ALLOWED_ORIGINS`
 // (comma-separated) so you can update allowed frontends without changing code.
 const defaultAllowedOrigins = [
-  'https://findmynotes-fawn.vercel.app',
-  'https://find-my-notes-psi.vercel.app',
+  'https://findmynotes-platform.vercel.app',
   'http://localhost:5173'
 ];
 
